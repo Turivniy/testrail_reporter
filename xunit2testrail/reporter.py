@@ -3,9 +3,12 @@ from __future__ import absolute_import, print_function
 from functools import wraps
 import logging
 import re
+import six
 from six.moves.urllib import parse
 
 from jinja2 import Environment, PackageLoader
+import xml.etree.ElementTree as ET
+
 import requests
 
 from .testrail import Client as TrClient
@@ -252,3 +255,63 @@ class Reporter(object):
 
     def print_run_url(self, test_run):
         print('[TestRun URL] {}'.format(test_run.url))
+
+# ================================================================
+
+    def describe_testrail_case(self, case):
+        return {
+            k: v
+            for k, v in case.data.items() if isinstance(v, six.string_types)
+        }
+
+    def get_cases(self):
+        """Get all the testcases from the server"""
+        cases_data = []
+        cases = self.suite.cases()
+        for case in cases:
+            case_data = self.describe_testrail_case(case)
+            cases_data.append(case_data)
+        return cases_data
+
+    def get_empty_classnames(self):
+        """Get empty classes from the xml file"""
+        tree = ET.parse(self.xunit_report)
+        root = tree.getroot()
+
+        classnames = []
+        for child in root:
+            if child.attrib['classname'] == '':
+                m = re.search('\(.*\)', child.attrib['name'])
+                classname = m.group()[1:-1]
+                classnames.append(classname)
+        return classnames
+
+    def get_testcases(self, all_cases, empty_classnames):
+        """Get testcases from the server by comparing with suits in the xml file"""
+        all_empty_cases = []
+        for empty_classname in empty_classnames:
+            for case in all_cases:
+                if empty_classname in case['title']:
+                    all_empty_cases.append((empty_classname, case['custom_report_label']))
+
+        return all_empty_cases
+
+    def update_testcases(self, cases):
+
+        tree = ET.parse(self.xunit_report)
+        root = tree.getroot()
+
+        for case in cases:
+            testcase = ET.Element("testcase")
+            testcase.attrib['classname'] = "{}".format(case[0])
+            testcase.attrib['name'] = "{}".format(case[1])
+            testcase.attrib['time'] = "0.000"
+
+            skip = ET.SubElement(testcase, 'failure')
+            skip.text = "Test suite was failed."
+
+            root.append(testcase)
+
+        tree = ET.ElementTree(root)
+        tree.write('temp_xunit_report.xml')
+        self.xunit_report = 'temp_xunit_report.xml'
