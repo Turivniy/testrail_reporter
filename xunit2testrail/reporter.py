@@ -274,27 +274,40 @@ class Reporter(object):
         return cases_data
 
     def get_empty_classnames(self):
-        """Get empty classes from the xml file"""
         tree = ET.parse(self.xunit_report)
         root = tree.getroot()
 
         classnames = []
+        classnames_data = {'classname': '', 'data': ''}
         for child in root:
-            if child.attrib['classname'] == '':
+            if child.attrib['classname'] == '' and child[0].tag == 'failure':
+
                 m = re.search('\(.*\)', child.attrib['name'])
                 classname = m.group()[1:-1]
-                classnames.append(classname)
+
+                classnames_data['classname'] = classname
+                classnames_data['data'] = child[0].text
+
+                classnames.append(classnames_data)
+
         return classnames
 
     def get_testcases(self, all_cases, empty_classnames):
-        """Get testcases from the server by comparing with suits in the xml file"""
+
         all_empty_cases = []
+        all_data_empty_cases = {'classname': '', 'name': '', 'data': ''}
         for empty_classname in empty_classnames:
             for case in all_cases:
-                if empty_classname in case['title']:
-                    all_empty_cases.append((empty_classname, case['custom_report_label']))
+                if empty_classname['classname'] in case['title']:
 
-        return all_empty_cases
+                    all_data_empty_cases['classname'] = empty_classname['classname']
+                    all_data_empty_cases['name'] = case['custom_report_label']
+                    all_data_empty_cases['data'] = empty_classname['data']
+
+                    all_empty_cases.append(all_data_empty_cases)
+
+        # Remove duplicates and return list of dics
+        return [dict(t) for t in {tuple(d.items()) for d in all_empty_cases}]
 
     def update_testcases(self, cases):
 
@@ -303,12 +316,12 @@ class Reporter(object):
 
         for case in cases:
             testcase = ET.Element("testcase")
-            testcase.attrib['classname'] = "{}".format(case[0])
-            testcase.attrib['name'] = "{}".format(case[1])
+            testcase.attrib['classname'] = "{}".format(case['classname'])
+            testcase.attrib['name'] = "{}".format(case['name'])
             testcase.attrib['time'] = "0.000"
 
             skip = ET.SubElement(testcase, 'failure')
-            skip.text = "Test suite was failed."
+            skip.text = case['data']
 
             root.append(testcase)
 
