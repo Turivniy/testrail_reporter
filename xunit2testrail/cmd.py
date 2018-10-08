@@ -227,19 +227,19 @@ def main(args=None):
 
     # ====================================================================
 
-    xunit_suite, _ = reporter.get_xunit_test_suite()
-    mapping = reporter.map_cases(xunit_suite)
-    if not args.dry_run:
-        cases = reporter.fill_case_results(mapping)
-        if len(cases) == 0:
-            logger.warning('No cases matched, programm will terminated')
-            return
-        plan = reporter.get_or_create_plan()
-        test_run = reporter.get_or_create_test_run(plan, cases)
-        test_run.add_results_for_cases(cases)
-        reporter.print_run_url(test_run)
-    else:
-        print_mapping_table(mapping)
+    # xunit_suite, _ = reporter.get_xunit_test_suite()
+    # mapping = reporter.map_cases(xunit_suite)
+    # if not args.dry_run:
+    #     cases = reporter.fill_case_results(mapping)
+    #     if len(cases) == 0:
+    #         logger.warning('No cases matched, programm will terminated')
+    #         return
+    #     plan = reporter.get_or_create_plan()
+    #     test_run = reporter.get_or_create_test_run(plan, cases)
+    #     test_run.add_results_for_cases(cases)
+    #     reporter.print_run_url(test_run)
+    # else:
+    #     print_mapping_table(mapping)
 
 
 if __name__ == '__main__':
