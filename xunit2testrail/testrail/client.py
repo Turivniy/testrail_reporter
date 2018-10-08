@@ -70,12 +70,6 @@ class Collection(object):
             url += '/{}'.format(self.parent_id)
         return self._handler('GET', url, params=params)
 
-    # def _add(self, name, data, **kwargs):
-    #     url = self._add_url.format(name=name)
-    #     if self.parent_id is not None:
-    #         url += '/{}'.format(self.parent_id)
-    #     return self._handler('POST', url, json=data, **kwargs)
-
     def find_all(self, **kwargs):
         return self().find_all(**kwargs)
 
@@ -89,11 +83,6 @@ class Collection(object):
 
     def get(self, id):
         return self._item_class.get(id)
-
-    # def add(self, **kwargs):
-    #     item = self._to_object(kwargs)
-    #     result = self._add(item._api_name(), item.data)
-    #     return self._to_object(result)
 
     def list(self):
         name = self._item_class._api_name()
@@ -155,22 +144,6 @@ class Project(Item):
     def suites(self):
         return Collection(Suite, parent_id=self.id)
 
-    # @property
-    # def plans(self):
-    #     return Collection(Plan, parent_id=self.id)
-    #
-    # @property
-    # def runs(self):
-    #     return Collection(Run, parent_id=self.id)
-    #
-    # @property
-    # def milestones(self):
-    #     return Collection(Milestone, parent_id=self.id)
-    #
-    # @property
-    # def configs(self):
-    #     return Collection(Config, parent_id=self.id)
-
 
 class Suite(Item):
     @property
@@ -183,24 +156,10 @@ class Suite(Item):
 
 class CaseCollection(Collection):
     pass
-    # def _add(self, name, data, **kwargs):
-    #     url = self._add_url.format(name=name)
-    #     section_id = data.pop('section_id')
-    #     data.pop('result', None)
-    #     url = '{}/{}'.format(url, section_id)
-    #     return self._handler('POST', url, json=data, **kwargs)
 
 
 class Case(Item):
     pass
-    # _repr_field = 'title'
-    #
-    # def __init__(self, *args, **kwargs):
-    #     super(Case, self).__init__(*args, **kwargs)
-    #     self.result = None
-
-    # def add_result(self, **kwargs):
-    #     self.result = Result(**kwargs)
 
 
 class Plan(Item):
@@ -219,149 +178,6 @@ class Plan(Item):
         }
         kwargs.update(add_kwargs)
         return super(self.__class__, self).__init__(id, **kwargs)
-
-    # @property
-    # def runs(self):
-    #     return ItemSet([Run.get(id=run['id'])
-    #                     for entry in self.entries for run in entry['runs']])
-    #
-    # def add_run(self, run):
-    #     url = 'add_plan_entry/{}'.format(self.id)
-    #     run_data = {
-    #         k: v
-    #         for k, v in run.data.items()
-    #         if k in ('case_ids', 'config_ids', 'name', 'description')
-    #     }
-    #     request = {
-    #         "suite_id": run.suite_id,
-    #         "name": run.name,
-    #         "description": run.description,
-    #         "config_ids": run.config_ids,
-    #         "include_all": run.include_all,
-    #         "case_ids": run.data['case_ids'],
-    #         "runs": [run_data],
-    #     }
-    #     result = self._handler('POST', url, json=request)
-    #     new_run_data = result['runs'][0]
-    #     run.id = new_run_data.pop('id')
-    #     run.data.update(new_run_data)
-
-    # def update_run(self, run):
-    #     entry = [_entry
-    #              for _entry in self.entries for _run in _entry['runs']
-    #              if _run['id'] == run.id
-    #              ].pop()
-    #     url = 'update_plan_entry/{0}/{1}'.format(self.id, entry['id'])
-    #     entry.update(self._handler('POST', url, json=run.data))
-
-
-# class Run(Item):
-#     def __init__(self,
-#                  suite_id=None,
-#                  milestone_id=None,
-#                  config_ids=(),
-#                  name="",
-#                  description="",
-#                  include_all=False,
-#                  case_ids=(),
-#                  assignedto_id=None,
-#                  id=None,
-#                  **kwargs):
-#         add_kwargs = locals()
-#         add_kwargs.pop('self')
-#         add_kwargs.pop('kwargs')
-#         add_kwargs.pop('id')
-#         add_kwargs.pop('__class__', None)  # always exists in Python 3
-#
-#         kwargs.update(add_kwargs)
-#         return super(self.__class__, self).__init__(id, **kwargs)
-#
-#     @property
-#     def tests(self):
-#         return Collection(Test, parent_id=self.id)
-#
-#     @property
-#     def results(self):
-#         return ResultCollection(Result, parent_id=self.id)
-#
-#     def add_results_for_cases(self, cases):
-#         if not self.include_all:
-#             # IDs can't be taken from self.case_ids set because it's always
-#             # empty now, see https://goo.gl/uunbEH
-#             cases_ids = [test.case_id for test in self.tests.list()]
-#             missing_cases_ids = [case.id for case in cases
-#                                  if case.id not in cases_ids]
-#             if missing_cases_ids:
-#                 logger.debug('Adding {0} missing test cases '
-#                              'to the run'.format(len(missing_cases_ids)))
-#                 self.case_ids = cases_ids + missing_cases_ids
-#                 try:
-#                     self.update()
-#                 except requests.HTTPError as e:
-#                     if e.response.status_code != 403:
-#                         raise
-#                     # error 403 'operation is not allowed' means that the run
-#                     # belongs to some plan and can't be edited independently
-#                     Plan.get(id=self.plan_id).update_run(run=self)
-#         return self.results.add_for_cases(self.id, cases)
-
-
-# class Test(Item):
-#     pass
-
-
-# class ResultCollection(Collection):
-#
-#     _list_url = 'get_results_for_run'
-#
-#     def add_for_cases(self, run_id, cases):
-#         if len(cases) == 0:
-#             logger.warning('No cases with result for run {}'.format(run_id))
-#             return
-#         results = []
-#         for case in cases:
-#             if case.result is None:
-#                 continue
-#             result = case.result.data
-#             result['case_id'] = case.id
-#             results.append(result)
-#         if results is not None:
-#             url = 'add_results_for_cases/{}'.format(run_id)
-#             result = self._handler('POST', url, json={'results': results})
-#             return [self._to_object(x) for x in result]
-#         else:
-#             return []
-
-
-# class Result(Item):
-#     def __init__(self,
-#                  status_id,
-#                  comment=None,
-#                  version=None,
-#                  elapsed=None,
-#                  defects=None,
-#                  assignedto_id=None,
-#                  id=None,
-#                  **kwargs):
-#         add_kwargs = {
-#             'status_id': status_id,
-#             'comment': comment,
-#             'version': version,
-#             'elapsed': elapsed,
-#             'defects': defects,
-#             'assignedto_id': assignedto_id,
-#         }
-#
-#         kwargs.update(add_kwargs)
-#         return super(self.__class__, self).__init__(id, **kwargs)
-
-
-# class Milestone(Item):
-#     pass
-#
-#
-# class Config(Item):
-#     pass
 
 
 class Client(object):
@@ -405,8 +221,3 @@ class Client(object):
     @property
     def projects(self):
         return Collection(Project)
-
-    # @property
-    # def statuses(self):
-    #     statuses = self._query('GET', 'get_statuses')
-    #     return {x['id']: x['name'] for x in statuses}

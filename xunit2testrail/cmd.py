@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
 import argparse
-import functools
 import logging
 import os
 import sys
-import textwrap
 import traceback
 import warnings
 
-import prettytable
 
 from xunit2testrail import TemplateCaseMapper
 from xunit2testrail import Reporter
@@ -160,20 +157,6 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def print_mapping_table(mapping, wrap=60):
-    """Print mapping result table."""
-    pt = prettytable.PrettyTable(field_names=['ID', 'Tilte', 'Xunit case'])
-    pt.align = 'l'
-    wrapper = functools.partial(
-        textwrap.fill, width=wrap, break_long_words=False)
-    for testrail_case, xunit_case in mapping.items():
-        xunit_str = '{0.methodname}\n({0.classname})'.format(xunit_case)
-        pt.add_row([
-            testrail_case.id, wrapper(testrail_case.title), wrapper(xunit_str)
-        ])
-    print(pt)
-
-
 def main(args=None):
 
     args = args or sys.argv[1:]
@@ -226,20 +209,6 @@ def main(args=None):
     reporter.update_testcases(all_empty_cases)
 
     # ====================================================================
-
-    # xunit_suite, _ = reporter.get_xunit_test_suite()
-    # mapping = reporter.map_cases(xunit_suite)
-    # if not args.dry_run:
-    #     cases = reporter.fill_case_results(mapping)
-    #     if len(cases) == 0:
-    #         logger.warning('No cases matched, programm will terminated')
-    #         return
-    #     plan = reporter.get_or_create_plan()
-    #     test_run = reporter.get_or_create_test_run(plan, cases)
-    #     test_run.add_results_for_cases(cases)
-    #     reporter.print_run_url(test_run)
-    # else:
-    #     print_mapping_table(mapping)
 
 
 if __name__ == '__main__':
