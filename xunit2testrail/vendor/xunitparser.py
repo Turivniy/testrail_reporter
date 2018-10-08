@@ -1,18 +1,18 @@
-import math
+# import math
 import unittest
-from datetime import timedelta
-from xml.etree import ElementTree
+# from datetime import timedelta
+# from xml.etree import ElementTree
 
 
-def to_timedelta(val):
-    if val is None:
-        return None
-
-    secs = float(val)
-    if math.isnan(secs):
-        return None
-
-    return timedelta(seconds=secs)
+# def to_timedelta(val):
+#     if val is None:
+#         return None
+#
+#     secs = float(val)
+#     if math.isnan(secs):
+#         return None
+#
+#     return timedelta(seconds=secs)
 
 
 class TestResult(unittest.TestResult):
@@ -127,16 +127,17 @@ class TestCase(unittest.TestCase):
 
 
 class TestSuite(unittest.TestSuite):
-    def __init__(self, *args, **kwargs):
-        super(TestSuite, self).__init__(*args, **kwargs)
-        self.properties = {}
-        self.stdout = None
-        self.stderr = None
-        self._cleanup = False
-
-
-class Parser(object):
     pass
+    # def __init__(self, *args, **kwargs):
+    #     super(TestSuite, self).__init__(*args, **kwargs)
+    #     self.properties = {}
+    #     self.stdout = None
+    #     self.stderr = None
+    #     self._cleanup = False
+
+
+# class Parser(object):
+#     pass
     # TC_CLASS = TestCase
     # TS_CLASS = TestSuite
     # TR_CLASS = TestResult

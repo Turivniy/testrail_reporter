@@ -71,15 +71,15 @@ class Reporter(object):
     def project(self):
         return self.testrail_client.projects.find(name=self.project_name)
 
-    @property
-    @memoize
-    def milestone(self):
-        return self.project.milestones.find(name=self.milestone_name)
+    # @property
+    # @memoize
+    # def milestone(self):
+    #     return self.project.milestones.find(name=self.milestone_name)
 
-    @property
-    @memoize
-    def os_config(self):
-        return self.project.configs.find(name='Operation System')
+    # @property
+    # @memoize
+    # def os_config(self):
+    #     return self.project.configs.find(name='Operation System')
 
     @property
     @memoize
@@ -91,23 +91,23 @@ class Reporter(object):
     def cases(self):
         return self.suite.cases()
 
-    @property
-    @memoize
-    def testrail_statuses(self):
-        return self.testrail_client.statuses
+    # @property
+    # @memoize
+    # def testrail_statuses(self):
+    #     return self.testrail_client.statuses
 
-    def get_or_create_plan(self):
-        """Get exists or create new TestRail Plan"""
-        try:
-            plan = self.project.plans.find(name=self.plan_name)
-        except NotFound:
-            plan = self.project.plans.add(name=self.plan_name,
-                                          description=self.plan_description,
-                                          milestone_id=self.milestone.id)
-            logger.debug('Created new plan "{}"'.format(self.plan_name))
-        else:
-            logger.debug('Founded plan "{}"'.format(self.plan_name))
-        return plan
+    # def get_or_create_plan(self):
+    #     """Get exists or create new TestRail Plan"""
+    #     try:
+    #         plan = self.project.plans.find(name=self.plan_name)
+    #     except NotFound:
+    #         plan = self.project.plans.add(name=self.plan_name,
+    #                                       description=self.plan_description,
+    #                                       milestone_id=self.milestone.id)
+    #         logger.debug('Created new plan "{}"'.format(self.plan_name))
+    #     else:
+    #         logger.debug('Founded plan "{}"'.format(self.plan_name))
+    #     return plan
 
     # def get_xunit_test_suite(self):
     #     with open(self.xunit_report) as f:
@@ -253,8 +253,8 @@ class Reporter(object):
     #             logger.debug('Test run "{}" not found'.format(run_name))
     #     return self.create_test_run(run_name, plan, cases)
 
-    def print_run_url(self, test_run):
-        print('[TestRun URL] {}'.format(test_run.url))
+    # def print_run_url(self, test_run):
+    #     print('[TestRun URL] {}'.format(test_run.url))
 
 # ================================================================
 
