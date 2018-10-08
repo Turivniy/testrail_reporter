@@ -133,22 +133,22 @@ class CaseMapper(object):
     def get_suitable_cases(self, xunit_case, cases):
         """Return all suitable testrail cases for xunit case."""
 
-    def map(self, xunit_suite, testrail_cases, allow_duplicates=False):
-        mapping = []
-        for xunit_case in xunit_suite:
-            suitable_cases = self.get_suitable_cases(xunit_case,
-                                                     testrail_cases)
-            if len(suitable_cases) == 0:
-                logger.warning(
-                    "xUnit case `{0}` doesn't match "
-                    "any TestRail Case".format(xunit_case))
-            for testrail_case in suitable_cases:
-                mapping.append((testrail_case, xunit_case))
-
-        if len(mapping) == 0 and all([len(xunit_suite), len(testrail_cases)]):
-            self.print_pair_data(testrail_cases[-1], xunit_case)
-        self._check_collisions(mapping, allow_duplicates=allow_duplicates)
-        return dict(mapping)
+    # def map(self, xunit_suite, testrail_cases, allow_duplicates=False):
+    #     mapping = []
+    #     for xunit_case in xunit_suite:
+    #         suitable_cases = self.get_suitable_cases(xunit_case,
+    #                                                  testrail_cases)
+    #         if len(suitable_cases) == 0:
+    #             logger.warning(
+    #                 "xUnit case `{0}` doesn't match "
+    #                 "any TestRail Case".format(xunit_case))
+    #         for testrail_case in suitable_cases:
+    #             mapping.append((testrail_case, xunit_case))
+    #
+    #     if len(mapping) == 0 and all([len(xunit_suite), len(testrail_cases)]):
+    #         self.print_pair_data(testrail_cases[-1], xunit_case)
+    #     self._check_collisions(mapping, allow_duplicates=allow_duplicates)
+    #     return dict(mapping)
 
 
 class TemplateCaseMapper(CaseMapper):
@@ -195,10 +195,10 @@ class TemplateCaseMapper(CaseMapper):
         return match_cases
 
 
-def truncate_head(banner, text, max_len):
-    max_text_len = min(max_len - len(banner), len(text))
-    start = '...\n'
-    if max_text_len < len(text):
-        max_text_len -= len(start)
-        text = start + text[-max_text_len:]
-    return banner + text
+# def truncate_head(banner, text, max_len):
+#     max_text_len = min(max_len - len(banner), len(text))
+#     start = '...\n'
+#     if max_text_len < len(text):
+#         max_text_len -= len(start)
+#         text = start + text[-max_text_len:]
+#     return banner + text
